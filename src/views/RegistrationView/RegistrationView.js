@@ -52,7 +52,7 @@ export default function RegistrationView({navigation}) {
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.logo}
-                    source={require('../../../assets/mountain-m.png')}
+                    source={require('../../../assets/savepoint_icon.png')}
                 />
                 <TextInput
                     style={styles.input}
@@ -98,7 +98,7 @@ export default function RegistrationView({navigation}) {
                     <Text style={styles.buttonTitle}>Create account</Text>
                 </TouchableOpacity>
                 <View style={styles.footerView}>
-                    <Text style={styles.footerText}>Already got an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Log in</Text></Text>
+                    <Text style={styles.footerText}>Already have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Log in</Text></Text>
                 </View>
             </KeyboardAwareScrollView>
         </View>

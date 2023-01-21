@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
+import { firebase } from '../../firebase/config'
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 export default function LoginView({navigation}) {
     const [email, setEmail] = useState('')
@@ -12,6 +15,28 @@ export default function LoginView({navigation}) {
     }
 
     const onLoginPress = () => {
+        const auth = getAuth(firebase);
+        const firestore = getFirestore(firebase);
+        signInWithEmailAndPassword(auth, email, password)
+            .then((response) => {
+                const uid = response.user.uid
+                const usersRef = doc(firestore, 'users', uid);
+                getDoc(usersRef)
+                    .then((firestoreDocument) => {
+                        if (!firestoreDocument.exists) {
+                            alert ("User does not exist.")
+                            return;
+                        }
+                        const user = firestoreDocument.data()
+                        navigation.navigate('Home', {user: user})
+                    })
+                    .catch((error) => {
+                        alert(error)
+                    });
+            })
+            .catch((error) => {
+                alert(error)
+        });
     }
 
     return (
@@ -21,7 +46,7 @@ export default function LoginView({navigation}) {
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.logo}
-                    source={require('../../../assets/mountain-m.png')}
+                    source={require('../../../assets/savepoint_icon.png')}
                 />
                 <TextInput
                     style={styles.input}
