@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Image, Text, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
-import { firebase } from '../../firebase/config'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import RegistrationButton from "./components/RegistrationButton"
 
 export default function RegistrationView({navigation}) {
     const [fullName, setFullName] = useState('')
@@ -14,35 +12,6 @@ export default function RegistrationView({navigation}) {
 
     const onFooterLinkPress = () => {
         navigation.navigate('Login')
-    }
-
-    const onRegisterPress = () => {
-        if (password !== confirmPassword) {
-            alert("Passwords don't match.")
-            return
-        }
-        const auth = getAuth(firebase);
-        const firestore = getFirestore(firebase);
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((response) => {
-                const uid = response.user.uid
-                const data = {
-                    id: uid,
-                    email,
-                    fullName,
-                };
-                const usersRef = doc(firestore, 'users', uid);
-                setDoc(usersRef, data)
-                    .then(() => {
-                        navigation.navigate('Home', {user: data})
-                    })
-                    .catch((error) => {
-                        alert(error)
-                    });
-            })
-            .catch((error) => {
-                alert(error)
-        });
     }
 
     return (
@@ -92,11 +61,7 @@ export default function RegistrationView({navigation}) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => onRegisterPress()}>
-                    <Text style={styles.buttonTitle}>Create account</Text>
-                </TouchableOpacity>
+                <RegistrationButton navigation={navigation} fullName={fullName} email={email} password={password} confirmPassword={confirmPassword} />
                 <View style={styles.footerView}>
                     <Text style={styles.footerText}>Already have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Log in</Text></Text>
                 </View>

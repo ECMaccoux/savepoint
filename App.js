@@ -39,7 +39,9 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator>
         { user ? (
-          <Stack.Screen name="Home" options={{ title: 'Savepoint' }} component={HomeView} />
+          <Stack.Screen name="Home" options={{ title: 'Savepoint' }}>
+            {props => <HomeView {...props} />}
+          </Stack.Screen>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginView} />

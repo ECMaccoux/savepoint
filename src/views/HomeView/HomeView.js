@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import { Text, View, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native'
+import { View, SafeAreaView, FlatList, TextInput} from 'react-native'
 import styles from './styles';
 import { firebase } from '../../firebase/config'
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore, collection, onSnapshot, query, where } from "firebase/firestore";
+import LogoutButton from "./components/LogoutButton"
+import GameSeparator from './components/GameSeparator';
+import Game from './components/Game';
 
 export default function HomeView(props) {
     const auth = getAuth(firebase);
@@ -22,9 +25,6 @@ export default function HomeView(props) {
                 setMasterDataSource(docs);
             }, (error) => {})
         }
-        else {
-
-        }
     }, []);
 
     const searchFilterFunction = (text) => {
@@ -40,31 +40,12 @@ export default function HomeView(props) {
             });
             setFilteredDataSource(newData);
             setSearch(text);
-        } else {
+        } 
+        else {
             setFilteredDataSource(masterDataSource);
             setSearch(text);
         }
     };
-
-    const GameView = ({item}) => {
-        return (
-            <Text style={styles.itemStyle} onPress={() => onGamePress(item)}>{item.data().name}</Text>
-        );
-    };
-    
-    const GameSeparatorView = () => {
-        return (
-            <View style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }} />
-        );
-    };
-
-    const onGamePress = (game) => {
-        alert('Id : ' + game.id + ' Name : ' + game.data().name);
-    };
-
-    const onLogoutPress = () => {
-        signOut(auth);
-    }
     
     return (
         <SafeAreaView style={{flex: 1}}>
@@ -79,17 +60,11 @@ export default function HomeView(props) {
                 <FlatList
                     data={filteredDataSource}
                     keyExtractor={(game, index) => index.toString()}
-                    ItemSeparatorComponent={GameSeparatorView}
-                    renderItem={GameView}
+                    ItemSeparatorComponent={GameSeparator}
+                    renderItem={Game}
                 />
             </View>
-            <View style={styles.bottom}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => onLogoutPress()}>
-                    <Text style={styles.buttonTitle}>Log out</Text>
-                </TouchableOpacity>
-            </View>
+            <LogoutButton></LogoutButton>
         </SafeAreaView>
     )
 }
