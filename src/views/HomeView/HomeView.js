@@ -1,86 +1,70 @@
 import React, {useState, useEffect} from 'react';
-import { Text, View, SafeAreaView, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native'
+import { Text, View, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native'
 import styles from './styles';
 import { firebase } from '../../firebase/config'
 import { getAuth, signOut } from "firebase/auth";
+import { getFirestore, collection, onSnapshot, query, where } from "firebase/firestore";
 
 export default function HomeView(props) {
-    const uid = props.userData.id;
+    const auth = getAuth(firebase);
+    const firestore = getFirestore(firebase);
+
     const [search, setSearch] = useState('');
     const [filteredDataSource, setFilteredDataSource] = useState([]);
     const [masterDataSource, setMasterDataSource] = useState([]);
+    
+    useEffect(() => {
+        if (auth.currentUser) {
+            const gamesRef = query(collection(firestore, 'games'), where('user', '==', auth.currentUser.uid));
+            onSnapshot(gamesRef, (snapshot) => {
+                const docs = snapshot.docs;
+                setFilteredDataSource(docs);
+                setMasterDataSource(docs);
+            }, (error) => {})
+        }
+        else {
 
-    // useEffect(() => {
-    //     fetch('https://jsonplaceholder.typicode.com/posts')
-    //       .then((response) => response.json())
-    //       .then((responseJson) => {
-    //         setFilteredDataSource(responseJson);
-    //         setMasterDataSource(responseJson);
-    //       })
-    //       .catch((error) => {
-    //         console.error(error);
-    //       });
-    //   }, []);
-
-    const onLogoutPress = () => {
-        const auth = getAuth(firebase);
-        signOut(auth);
-    }
+        }
+    }, []);
 
     const searchFilterFunction = (text) => {
-        // Check if searched text is not blank
         if (text) {
-            // Inserted text is not blank
-            // Filter the masterDataSource
-            // Update FilteredDataSource
             const newData = masterDataSource.filter(
-            function (item) {
-                const itemData = item.title
-                    ? item.title.toUpperCase()
-                    : ''.toUpperCase();
-                const textData = text.toUpperCase();
-                return itemData.indexOf(textData) > -1;
+                function (game) {
+                    const gameName = game.data().name;
+                    const gameData = gameName
+                        ? gameName.toUpperCase()
+                        : ''.toUpperCase();
+                    const textData = text.toUpperCase();
+                    return gameData.indexOf(textData) > -1;
             });
             setFilteredDataSource(newData);
             setSearch(text);
         } else {
-            // Inserted text is blank
-            // Update FilteredDataSource with masterDataSource
             setFilteredDataSource(masterDataSource);
             setSearch(text);
         }
     };
 
-    const ItemView = ({item}) => {
+    const GameView = ({item}) => {
         return (
-            // Flat List Item
-            <Text
-                style={styles.itemStyle}
-                onPress={() => getItem(item)}>
-                {item.id}
-                {'.'}
-                {item.title.toUpperCase()}
-            </Text>
+            <Text style={styles.itemStyle} onPress={() => onGamePress(item)}>{item.data().name}</Text>
         );
     };
     
-    const ItemSeparatorView = () => {
+    const GameSeparatorView = () => {
         return (
-            // Flat List Item Separator
-            <View
-                style={{
-                    height: 0.5,
-                    width: '100%',
-                    backgroundColor: '#C8C8C8',
-                }}
-            />
+            <View style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }} />
         );
     };
 
-    const getItem = (item) => {
-        // Function for click on an item
-        alert('Id : ' + item.id + ' Title : ' + item.title);
+    const onGamePress = (game) => {
+        alert('Id : ' + game.id + ' Name : ' + game.data().name);
     };
+
+    const onLogoutPress = () => {
+        signOut(auth);
+    }
     
     return (
         <SafeAreaView style={{flex: 1}}>
@@ -90,13 +74,13 @@ export default function HomeView(props) {
                     onChangeText={(text) => searchFilterFunction(text)}
                     value={search}
                     underlineColorAndroid="transparent"
-                    placeholder="Search Here"
+                    placeholder="Search"
                 />
                 <FlatList
                     data={filteredDataSource}
-                    keyExtractor={(item, index) => index.toString()}
-                    ItemSeparatorComponent={ItemSeparatorView}
-                    renderItem={ItemView}
+                    keyExtractor={(game, index) => index.toString()}
+                    ItemSeparatorComponent={GameSeparatorView}
+                    renderItem={GameView}
                 />
             </View>
             <View style={styles.bottom}>

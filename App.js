@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack';
 import { LoginView, HomeView, RegistrationView } from './src/views'
-import {decode, encode} from 'base-64'
+import { decode, encode } from 'base-64'
 import { firebase } from './src/firebase/config'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-if (!global.btoa) {  global.btoa = encode }
+if (!global.btoa) { global.btoa = encode }
 if (!global.atob) { global.atob = decode }
 
 const Stack = createStackNavigator();
@@ -39,9 +39,7 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator>
         { user ? (
-          <Stack.Screen name="Home" options={{ title: 'Savepoint' }}>
-            {props => <HomeView {...props} userData={user} />}
-          </Stack.Screen>
+          <Stack.Screen name="Home" options={{ title: 'Savepoint' }} component={HomeView} />
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginView} />
