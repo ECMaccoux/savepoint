@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "savepoint",
-    "slug": "savepoint",
+    "name": "Savepoint",
+    "slug": "Savepoint",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/savepoint_icon.png",

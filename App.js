@@ -24,10 +24,13 @@ function App() {
         const uid = user.uid
         const usersRef = doc(firestore, 'users', uid);
         getDoc(usersRef)
-        .then((firestoreDocument) => {
-          const userData = firestoreDocument.data()
-          setUser(userData)
-        })
+          .then((firestoreDocument) => {
+            const userData = firestoreDocument.data()
+            setUser(userData)
+          })
+      }
+      else {
+        setUser(null);
       }
     });
   }, []);
@@ -36,8 +39,8 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator>
         { user ? (
-          <Stack.Screen name="Home">
-            {props => <HomeView {...props} extraData={user} />}
+          <Stack.Screen name="Home" options={{ title: 'Savepoint' }}>
+            {props => <HomeView {...props} userData={user} />}
           </Stack.Screen>
         ) : (
           <>
